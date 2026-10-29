@@ -1,0 +1,121 @@
+<html>
+<head>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../install/ChemDoodleWeb.css" type="text/css">
+  <link rel="stylesheet" href="../install/uis/jquery-ui-1.11.4.css" type="text/css">
+  <script type="text/javascript" src="../install/ChemDoodleWeb.js"></script>
+  <script type="text/javascript" src="../install/uis/ChemDoodleWeb-uis.js"></script>
+  <title>ChemDoodle Web Component Sketcher (Full Sketcher)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .sketcher-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 24px;
+      max-width: 600px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Button Styling */
+    .reaction-button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Arial', sans-serif;
+      color: #ffffff;
+      background-color: #6200EE;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .reaction-button:hover {
+      background-color: #7200EE;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .reaction-button:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .reaction-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.3);
+    }
+
+    canvas#sketcher {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .sketcher-container {
+        padding: 16px;
+      }
+
+      .reaction-button {
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="sketcher-container">
+  <!-- Top Sketcher Canvas -->
+  <canvas id="sketcher" width="500" height="300"></canvas>
+  <!-- Export + View Button -->
+  <button class="reaction-button" onclick="exportAndViewMOL()">THE REACTION IS CORRECT</button>
+</div>
+
+<script>
+  // Customizing colors
+  ChemDoodle.ELEMENT['H'].jmolColor = 'black';
+  ChemDoodle.ELEMENT['S'].jmolColor = '#B9A130';
+
+  // Initialize Sketcher
+  var sketcher = new ChemDoodle.SketcherCanvas('sketcher', 500, 300, { useServices: true });
+  sketcher.specs.atoms_displayTerminalCarbonLabels_2D = true;
+  sketcher.specs.atoms_useJMOLColors = true;
+  sketcher.specs.bonds_clearOverlaps_2D = true;
+  sketcher.specs.shapes_color = '#c10000';
+  sketcher.repaint();
+
+  function exportAndViewMOL() {
+    const mol = ChemDoodle.writeMOL(sketcher.getMolecule());
+    const molecule = ChemDoodle.readMOL(mol);
+
+    // Capture screenshot of the sketcher canvas
+    const canvas = document.getElementById('sketcher');
+    const screenshotDataUrl = canvas.toDataURL('image/jpeg');
+
+    if (window.AndroidBridge) {
+      window.AndroidBridge.sendMOLData(mol);
+      window.AndroidBridge.sendScreenshot(screenshotDataUrl);
+    }
+  }
+</script>
+</body>
+</html>

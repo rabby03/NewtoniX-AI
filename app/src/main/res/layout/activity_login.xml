@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/rootLayout"
+
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"> <!-- Will be set programmatically -->
+
+        <!-- Welcome Text (Static, no animation here) -->
+        <TextView
+            android:id="@+id/welcomeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_text"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+        android:layout_gravity="center"
+        android:layout_marginBottom="2dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Revived"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Email Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_marginHorizontal="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            app:hintTextColor="#FFFFFF"
+            android:textColorHint="#B0FFFFFF">
+            <com.google.android.material.textfield.TextInputEditText
+                android:padding="10dp"
+                android:shadowColor="#673AB7"
+                android:shadowRadius="@integer/material_motion_duration_medium_2"
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="#FFFFFF"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Password Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:hint="Password"
+            app:hintTextColor="#FFFFFF"
+            android:textColorHint="#B0FFFFFF">
+            <com.google.android.material.textfield.TextInputEditText
+                android:padding="10dp"
+                android:id="@+id/passwordEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="#FFFFFF"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_marginHorizontal="100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:layout_marginTop="10dp"
+            android:textColor="#FFFFFF"/>
+
+    <HorizontalScrollView
+        android:scrollbars="none"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="25dp"
+            android:paddingEnd="25dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="5dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+            <!-- Google Sign-In Button -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/googleSignInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                app:icon="@drawable/google"
+                android:layout_marginLeft="20dp"
+                app:iconTintMode="multiply"
+                android:layout_marginRight="10dp"
+                android:textColor="#FFFFFF" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/facebookSignInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               android:text="F"
+                android:layout_marginRight="10dp"
+                android:backgroundTint="#2196F3"
+                android:textColor="#FFFFFF"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/twitterSignInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X"
+                android:backgroundTint="#4C526F"
+                android:layout_marginRight="10dp"
+                android:textColor="#FFFFFF"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/microsoftSignInButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/microsoft"
+                app:iconTintMode="multiply"
+                android:backgroundTint="#9C27B0"
+                android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+        <!-- Sign-Up Prompt -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Don't have any account? Create an account now!"
+            android:textSize="15sp"
+            android:textColor="#FF9800"
+            android:layout_marginTop="10dp"
+            android:padding="5dp"
+            android:shadowRadius="@integer/material_motion_duration_long_1"/>
+
+        <!-- Sign-Up Button -->
+        <Button
+            android:id="@+id/signupButton"
+            android:layout_marginHorizontal="100dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Sign Up"
+            android:textColor="#FFFFFF"/>
+
+
+    </LinearLayout>
+</ScrollView>

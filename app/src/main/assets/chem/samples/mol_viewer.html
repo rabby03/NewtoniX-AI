@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+
+    <title>Benzene - ChemDoodle Web Component Viewer</title>
+    <!-- Load ChemDoodle Web Components CSS and JS -->
+    <link rel="stylesheet" href="../install/ChemDoodleWeb.css" type="text/css">
+    <script type="text/javascript" src="../install/ChemDoodleWeb.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #viewer {
+            border: 1px solid #ccc;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <canvas id="viewer" width="600" height="400"></canvas>
+    <div id="errorMessage"></div>
+</div>
+<script type="text/javascript">
+    // Check if ChemDoodle is loaded
+    if (typeof ChemDoodle === 'undefined') {
+        document.getElementById('errorMessage').innerText =
+            'Error: ChemDoodle library failed to load. Please check the file path ../install/ChemDoodleWeb.js or download the library.';
+    } else {
+        // Customize viewer settings
+        ChemDoodle.ELEMENT['C'].jmolColor = 'black';
+        ChemDoodle.ELEMENT['H'].jmolColor = 'black';
+
+        // Initialize ViewerCanvas
+        var viewer = new ChemDoodle.ViewerCanvas('viewer', 600, 400);
+        viewer.specs.backgroundColor = 'white';
+        viewer.specs.bonds_width_2D = 1.2;
+        viewer.specs.bonds_saturationWidth_2D = 0.18;
+        viewer.specs.atoms_displayTerminalCarbonLabels_2D = true;
+        viewer.specs.atoms_useJMOLColors = true;
+        viewer.specs.bonds_clearOverlaps_2D = true;
+
+        // Benzene molecule in MDL MOL format
+        var benzeneMol = `
+Benzene from ChemDoodle Web Components
+http://www.ichemlabs.com
+  6  6  0  0  0  0  999 V2000
+    1.0000    0.0000    0.0000 C   0  0  0  0  0  0
+    0.5000    0.8660    0.0000 C   0  0  0  0  0  0
+   -0.5000    0.8660    0.0000 C   0  0  0  0  0  0
+   -1.0000    0.0000    0.0000 C   0  0  0  0  0  0
+   -0.5000   -0.8660    0.0000 C   0  0  0  0  0  0
+    0.5000   -0.8660    0.0000 C   0  0  0  0  0  0
+  1  2  2  0  0  0
+  2  3  1  0  0  0
+  3  4  2  0  0  0
+  4  5  1  0  0  0
+  5  6  2  0  0  0
+  6  1  1  0  0  0
+M  END
+`;
+        try {
+            var molecule = ChemDoodle.readMOL(benzeneMol);
+            viewer.loadMolecule(molecule);
+        } catch (e) {
+            document.getElementById('errorMessage').innerText =
+                'Error rendering molecule: ' + e.message;
+        }
+    }
+</script>
+</body>
+</html>

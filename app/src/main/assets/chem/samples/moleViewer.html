@@ -1,0 +1,43 @@
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+
+    <link rel="stylesheet" href="../install/ChemDoodleWeb.css" type="text/css">
+    <script type="text/javascript" src="../install/ChemDoodleWeb.js"></script>
+    <title>ChemDoodle MOL Viewer</title>
+</head>
+<body>
+<center>
+    <h2>ChemDoodle MOL Viewer</h2>
+    <canvas id="molViewer" width="500" height="300"></canvas>
+    <br><br>
+    <textarea id="molInput" rows="10" cols="60" placeholder="Paste MOL content here..."></textarea>
+    <br>
+    <button onclick="loadMol()">Load MOL</button>
+</center>
+
+<script>
+    // Create the viewer
+    const viewer = new ChemDoodle.ViewerCanvas('molViewer', 500, 300);
+    viewer.specs.atoms_displayTerminalCarbonLabels_2D = true;
+    viewer.specs.atoms_useJMOLColors = true;
+    viewer.specs.bonds_clearOverlaps_2D = true;
+
+
+    // Preload the molecule
+    window.onload = () => {
+      loadMol(text);
+    };
+
+    function loadMol(text) {
+      try {
+        const mol = ChemDoodle.readMOL("`"+text+"`;");
+        viewer.loadMolecule(text);
+      } catch (e) {
+        alert("Failed to parse MOL data. Please check the format.");
+      }
+    }
+</script>
+</body>
+</html>

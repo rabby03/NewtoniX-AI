@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <link rel="manifest" href="/circuit/manifest.json">
+  
+    <!-- Properties can be specified to influence deferred binding -->
+    <meta name='gwt:property' content='locale=en_UK'>
+
+
+    <!-- Titles are optional, but useful -->
+    <title></title>
+
+<style>
+  /* General styles */
+  .disabled {
+      color: lightgray;
+  }
+
+  .topSpace {
+      margin-top: 1rem; /* Use rem for scalability */
+  }
+
+  .cursorPointer {
+      cursor: default;
+  }
+
+  .cursorCross {
+      cursor: crosshair;
+  }
+
+  .cursorSplitter {
+      cursor: row-resize;
+  }
+
+  .gwt-MenuItem-disabled {
+      color: lightgray;
+  }
+
+  .offScreen {
+      position: absolute;
+      right: 100%; /* Simplified to avoid overflow issues */
+      overflow: hidden;
+  }
+
+  .gwt-Frame {
+      border: 0 !important; /* Removed scrolling="no" as it's an HTML attribute */
+  }
+
+  .gwt-MenuItem {
+      font-size: 0.875rem !important; /* ~14px, better for mobile */
+  }
+
+  .gwt-MenuBar-horizontal {
+      font-size: 0.875rem !important;
+  }
+
+  .gwt-Label-selected {
+      font-size: 1.5rem; /* Larger for emphasis */
+      font-weight: 700;
+      border-top: 1px solid black;
+      border-bottom: 1px solid black;
+  }
+
+  .gwt-Label-1off {
+      color: DarkGray;
+  }
+
+  .gwt-Label-2off {
+      font-size: 0.75rem; /* Slightly larger for readability */
+      color: #a0a0a0; /* Higher contrast than LightGray */
+  }
+
+  .gwt-Label-current {
+      /* No changes needed */
+  }
+
+  .gwt-Button.chbut {
+      padding: 0.5rem;
+      margin: 0.25rem;
+      min-width: 44px; /* Touch-friendly size */
+      min-height: 44px;
+  }
+
+  .gwt-Button.chbut.chsel {
+      font-weight: bold;
+  }
+
+  .gwt-Button.chbut-black {
+      background: black;
+      color: white;
+  }
+
+  .gwt-Button.chbut-white {
+      background: white;
+      color: black;
+  }
+
+  .gwt-TextBox.scalebox {
+      width: 100%; /* Full width for mobile */
+      max-width: 200px; /* Prevent excessive stretching */
+  }
+
+  .gwt-Button.expand-but {
+      line-height: 1;
+      font-size: 1rem; /* Larger for readability */
+      margin-right: 0.5rem;
+      border-radius: 0;
+      display: inline-flex; /* Better alignment */
+      align-items: center;
+      justify-content: center;
+      width: 44px; /* Touch-friendly */
+      height: 44px;
+      padding: 0;
+      margin-bottom: 0.25rem;
+      background: gray;
+      color: white;
+  }
+
+  .topButton-red {
+      margin: 0.5rem 0.25rem;
+      padding: 0.75rem 1rem; /* Larger padding for touch */
+      text-decoration: none;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 1rem; /* Larger for readability */
+      background-color: #ff0000;
+      border: 1px solid #bbb;
+      border-bottom: 1px solid #a0a0a0;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      min-width: 44px;
+      min-height: 44px;
+  }
+
+  .topButton {
+      margin: 0.5rem 0.25rem;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 1rem;
+      background-color: #e7e7e7;
+      border: 1px solid #bbb;
+      border-bottom: 1px solid #a0a0a0;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      min-width: 44px;
+      min-height: 44px;
+  }
+
+  .radioPanel label {
+      margin-right: 1rem;
+      font-size: 1rem; /* Larger for readability */
+  }
+
+  /* Mobile-specific adjustments */
+  @media screen and (max-width: 768px) {
+      .gwt-MenuItem,
+      .gwt-MenuBar-horizontal {
+          font-size: 1rem !important; /* Slightly larger for mobile */
+      }
+
+      .gwt-TextBox.scalebox {
+          width: 100%; /* Full width on smaller screens */
+          max-width: none; /* Remove max-width constraint */
+      }
+
+      .gwt-Button.chbut,
+      .topButton,
+      .topButton-red,
+      .gwt-Button.expand-but {
+          padding: 0.75rem; /* Larger padding for touch */
+          font-size: 1.1rem; /* Larger text */
+          min-width: 48px; /* Slightly larger touch target */
+          min-height: 48px;
+      }
+
+      .radioPanel {
+          display: flex;
+          flex-direction: column; /* Stack radio buttons vertically */
+          gap: 0.5rem; /* Space between items */
+      }
+
+      .radioPanel label {
+          margin-right: 0; /* Remove margin for vertical layout */
+      }
+
+      /* Remove cursor styles for touch devices */
+      .cursorPointer,
+      .cursorCross,
+      .cursorSplitter {
+          cursor: default; /* No special cursor needed */
+      }
+
+      .topSpace {
+          margin-top: 1.5rem; /* More spacing for mobile */
+      }
+  }
+
+  @media screen and (max-width: 480px) {
+      .gwt-Label-selected {
+          font-size: 1.3rem; /* Slightly smaller for very small screens */
+      }
+
+      .gwt-Label-2off {
+          font-size: 0.7rem; /* Adjust for smaller screens */
+      }
+
+      .gwt-Button.chbut,
+      .topButton,
+      .topButton-red {
+          width: 100%; /* Full-width buttons for small screens */
+          margin: 0.5rem 0; /* Stack vertically with spacing */
+      }
+
+      .gwt-Button.expand-but {
+          width: 48px; /* Keep touch-friendly size */
+          height: 48px;
+      }
+  }
+
+  /* Ensure viewport scalability */
+  @-ms-viewport {
+      width: device-width;
+  }
+  @viewport {
+      width: device-width;
+  }
+
+</style>
+
+<link rel="stylesheet" href="font/fontello.css">
+
+</head>
+  <body>
+  <!-- Include the next line to allow support for dropbox import/export. You will need your own app key. -->
+  <!--<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="YOUR_KEY"></script>-->
+
+  <script language="javascript" src="lz-string.min.js"></script>
+   
+    <!-- This script tag is what actually loads the GWT module.  The -->
+    <!-- 'nocache.js' file (also called a "selection script") is     -->
+    <!-- produced by the GWT compiler in the module output directory -->
+    <!-- or generated automatically in development mode.             -->
+    <script language="javascript" src="circuitjs1/circuitjs1.nocache.js"></script>
+    
+    <!-- Include a history iframe to enable full GWT history support -->
+    <!-- (the id must be exactly as shown)                           -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
+    
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+	navigator.serviceWorker.register('service-worker.js').then(registration => {
+	  console.log('Service Worker registered with scope:', registration.scope);
+	}).catch(error => {
+	  console.error('Service Worker registration failed:', error);
+	});
+      });
+    }
+    </script>
+
+  </body>
+ </html>

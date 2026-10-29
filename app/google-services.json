@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "360787817100",
+    "project_id": "newtonix-ai-revived",
+    "storage_bucket": "newtonix-ai-revived.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360787817100:android:a1be625b886e55ba6d01a9",
+        "android_client_info": {
+          "package_name": "com.rabbyx.newtonixairevivededition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360787817100-68iuml8lj7bgb5sa48hgp9fosdcl5t2d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rabbyx.newtonixairevivededition",
+            "certificate_hash": "eef741488bbe1a695beea57ffec1038252628365"
+          }
+        },
+        {
+          "client_id": "360787817100-58q58fpp3cc67rojao2kiv30gg0fcvgp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALSQgNLJHGrDZgRDHGBzN8B9uYyyKHces"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360787817100-58q58fpp3cc67rojao2kiv30gg0fcvgp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

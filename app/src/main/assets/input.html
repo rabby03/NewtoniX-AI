@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>MathQuill with Custom Keyboard Tabs</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.css" />
+    <style>
+
+
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 10px;
+            overscroll-behavior: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .math-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        .mathquill-field {
+            width: 100%;
+            min-height: 60px;
+            border: 1px solid #ccc;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: clamp(16px, 5vw, 20px);
+        }
+        .keyboard-container {
+            margin-top: 8px;
+            border: 1px solid #ddd;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            position: relative;
+        }
+        .tabs-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+
+                    /* QWERTY Tab Layout */
+            .tab-content#qwerty {
+                display: grid;
+                grid-template-columns: repeat(10, minmax(40px, 1fr)); /* 10 keys per row for numbers and letters */
+                gap: 4px;
+                align-items: center;
+            }
+
+            /* Spacebar Styling */
+            .key.spacebar {
+                grid-column: span 4; /* Make spacebar wider, spanning 4 columns */
+                min-width: 120px; /* Ensure minimum width */
+            }
+
+            /* Adjust QWERTY layout for smaller screens */
+            @media (max-width: 600px) {
+                .tab-content#qwerty {
+                    grid-template-columns: repeat(10, minmax(35px, 1fr));
+                    gap: 3px;
+                }
+                .key.spacebar {
+                    grid-column: span 3; /* Slightly narrower on small screens */
+                    min-width: 90px;
+                }
+            }
+
+            /* Ensure consistent key height in QWERTY tab */
+            .tab-content#qwerty .key {
+                min-height: 40px; /* Match other keys */
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
+            scroll-behavior: smooth;
+        }
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .tab {
+            padding: 8px 12px;
+            background: #e0e0e0;
+            margin: 0 2px 2px 0;
+            border-radius: 4px 4px 0 0;
+            font-weight: bold;
+            font-size: clamp(12px, 3.5vw, 14px);
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+        .tab.active {
+            background: #fff;
+            border-bottom: 2px solid #007bff;
+        }
+        .scroll-arrow {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: background 0.2s ease;
+        }
+        .scroll-arrow:hover,
+        .scroll-arrow:active {
+            background: #ddd;
+        }
+        .scroll-arrow.left {
+            left: 0;
+        }
+
+        .scroll-arrow.right {
+            right: 0;
+        }
+
+        .scroll-arrow.hidden {
+            display: none;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, auto));
+            gap: 4px;
+        }
+        .key {
+            padding: 8px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: clamp(14px, 4vw, 16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            box-sizing: border-box;
+        }
+        .key:hover,
+        .key:active {
+            background: #f0f0f0;
+        }
+        .backspace-button {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #f0f0f0;
+            font-size: clamp(12px, 3.5vw, 14px);
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 100px;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+        .backspace-button:hover,
+        .backspace-button:active {
+            background-color: #ddd;
+        }
+
+        /* Media Queries for Fine-Tuning */
+        @media (max-width: 600px) {
+            body {
+                padding: 8px;
+            }
+            .mathquill-field {
+                min-height: 50px;
+                padding: 6px;
+            }
+            .keyboard-container {
+                padding: 6px;
+            }
+            .tabs {
+                gap: 2px;
+            }
+            .tab {
+                padding: 6px 10px;
+            }
+            .scroll-arrow {
+                width: 28px;
+                height: 28px;
+                font-size: 18px;
+            }
+            .tab-content.active {
+                grid-template-columns: repeat(auto-fit, minmax(35px, auto));
+                gap: 3px;
+            }
+            .key {
+                padding: 6px;
+            }
+            .backspace-button {
+                padding: 6px 10px;
+            }
+        }
+
+        /* Ensure MathQuill scales properly */
+        .mathquill-embedded-latex {
+            font-size: inherit !important;
+        }
+    </style>
+</head>
+<body>
+<div class="math-container">
+    <span id="mathField" virtual-keyboard-mode="manual"
+          virtual-keyboard-theme="apple" class="mathquill-field"></span>
+    <div class="keyboard-container">
+        <div class="tabs-container">
+            <div class="scroll-arrow left hidden" id="scrollLeft">←</div>
+            <div class="tabs">
+                <div class="tab active" data-tab="qwerty">QWERTY</div>
+                <div class="tab active" data-tab="greek">Greek</div>
+                <div class="tab" data-tab="algebra">Algebra</div>
+                <div class="tab" data-tab="logic">Logic</div>
+                <div class="tab" data-tab="set">Set</div>
+                <div class="tab" data-tab="functions">Functions</div>
+                <div class="tab" data-tab="calculus">Calculus</div>
+                <div class="tab" data-tab="trigonometry">Trigonometry</div>
+                <div class="tab" data-tab="matrix">Matrix</div>
+                <div class="tab" data-tab="vector">Vector</div>
+                <div class="tab" data-tab="permutation">Permutation</div>
+                <div class="tab" data-tab="geometry">Geometry</div>
+                <div class="tab" data-tab="probability">Probability</div>
+                <div class="tab" data-tab="constants">Constants</div>
+                <div class="tab" data-tab="operators">Operators</div>
+                <div class="tab" data-tab="symbols">Symbols</div>
+                <div class="tab" data-tab="accents">Accents</div>
+                <div class="tab" data-tab="relations">Relations</div>
+            </div>
+            <div class="scroll-arrow right hidden" id="scrollRight">→</div>
+        </div>
+        <!-- Greek Tab -->
+        <div class="tab-content active" id="greek">
+            <!-- Lowercase Greek letters -->
+            <div class="key" data-latex="\alpha">α</div>
+            <div class="key" data-latex="\beta">β</div>
+            <div class="key" data-latex="\gamma">γ</div>
+            <div class="key" data-latex="\delta">δ</div>
+            <div class="key" data-latex="\epsilon">ε</div>
+            <div class="key" data-latex="\varepsilon">ϵ</div>
+            <div class="key" data-latex="\zeta">ζ</div>
+            <div class="key" data-latex="\eta">η</div>
+            <div class="key" data-latex="\theta">θ</div>
+            <div class="key" data-latex="\vartheta">ϑ</div>
+            <div class="key" data-latex="\iota">ι</div>
+            <div class="key" data-latex="\kappa">κ</div>
+            <div class="key" data-latex="\lambda">λ</div>
+            <div class="key" data-latex="\mu">μ</div>
+            <div class="key" data-latex="\nu">ν</div>
+            <div class="key" data-latex="\xi">ξ</div>
+            <div class="key" data-latex="\pi">π</div>
+            <div class="key" data-latex="\varpi">ϖ</div>
+            <div class="key" data-latex="\rho">ρ</div>
+            <div class="key" data-latex="\varrho">ϱ</div>
+            <div class="key" data-latex="\sigma">σ</div>
+            <div class="key" data-latex="\varsigma">ς</div>
+            <div class="key" data-latex="\tau">τ</div>
+            <div class="key" data-latex="\phi">φ</div>
+            <div class="key" data-latex="\varphi">ϕ</div>
+            <div class="key" data-latex="\chi">χ</div>
+            <div class="key" data-latex="\psi">ψ</div>
+            <div class="key" data-latex="\omega">ω</div>
+
+            <!-- Uppercase Greek letters -->
+            <div class="key" data-latex="\Gamma">Γ</div>
+            <div class="key" data-latex="\Delta">Δ</div>
+            <div class="key" data-latex="\Theta">Θ</div>
+            <div class="key" data-latex="\Lambda">Λ</div>
+            <div class="key" data-latex="\Xi">Ξ</div>
+            <div class="key" data-latex="\Pi">Π</div>
+            <div class="key" data-latex="\Sigma">Σ</div>
+            <div class="key" data-latex="\Upsilon">Υ</div>
+            <div class="key" data-latex="\Phi">Φ</div>
+            <div class="key" data-latex="\Psi">Ψ</div>
+            <div class="key" data-latex="\Omega">Ω</div>
+        </div>
+
+        <div class="tab-content active" id="qwerty"> <!-- Active by default -->
+            <!-- Numbers Row -->
+            <div class="key" data-latex="1">1</div>
+            <div class="key" data-latex="2">2</div>
+            <div class="key" data-latex="3">3</div>
+            <div class="key" data-latex="4">4</div>
+            <div class="key" data-latex="5">5</div>
+            <div class="key" data-latex="6">6</div>
+            <div class="key" data-latex="7">7</div>
+            <div class="key" data-latex="8">8</div>
+            <div class="key" data-latex="9">9</div>
+            <div class="key" data-latex="0">0</div>
+            <!-- QWERTY Row -->
+            <div class="key" data-latex="q">q</div>
+            <div class="key" data-latex="w">w</div>
+            <div class="key" data-latex="e">e</div>
+            <div class="key" data-latex="r">r</div>
+            <div class="key" data-latex="t">t</div>
+            <div class="key" data-latex="y">y</div>
+            <div class="key" data-latex="u">u</div>
+            <div class="key" data-latex="i">i</div>
+            <div class="key" data-latex="o">o</div>
+            <div class="key" data-latex="p">p</div>
+            <!-- ASDFG Row -->
+            <div class="key" data-latex="a">a</div>
+            <div class="key" data-latex="s">s</div>
+            <div class="key" data-latex="d">d</div>
+            <div class="key" data-latex="f">f</div>
+            <div class="key" data-latex="g">g</div>
+            <div class="key" data-latex="h">h</div>
+            <div class="key" data-latex="j">j</div>
+            <div class="key" data-latex="k">k</div>
+            <div class="key" data-latex="l">l</div>
+            <!-- ZXCVB Row -->
+            <div class="key" data-latex="z">z</div>
+            <div class="key" data-latex="x">x</div>
+            <div class="key" data-latex="c">c</div>
+            <div class="key" data-latex="v">v</div>
+            <div class="key" data-latex="b">b</div>
+            <div class="key" data-latex="n">n</div>
+            <div class="key" data-latex="m">m</div>
+            <!-- Punctuation and Space -->
+            <div class="key" data-latex=",">,</div>
+            <div class="key" data-latex=".">.</div>
+            <div class="key spacebar" data-latex=" ">Space</div> <!-- Wider spacebar -->
+        </div>
+
+        <!-- Logic Tab -->
+        <div class="tab-content" id="logic">
+            <!-- Standard logical operators -->
+            <div class="key" data-latex="\neg">¬</div>
+            <div class="key" data-latex="\land">∧</div>
+            <div class="key" data-latex="\lor">∨</div>
+            <div class="key" data-latex="\rightarrow">→</div>
+            <div class="key" data-latex="\Leftarrow">⇐</div>
+            <div class="key" data-latex="\Rightarrow">⇒</div>
+            <div class="key" data-latex="\leftrightarrow">↔</div>
+            <div class="key" data-latex="\Leftrightarrow">⇔</div>
+
+            <!-- Quantifiers -->
+            <div class="key" data-latex="\forall">∀</div>
+            <div class="key" data-latex="\exists">∃</div>
+            <div class="key" data-latex="\nexists">∄</div>
+
+            <!-- Logical entailment and proof symbols -->
+            <div class="key" data-latex="\vdash">⊢</div>
+            <div class="key" data-latex="\dashv">⊣</div>
+            <div class="key" data-latex="\models">⊨</div>
+            <div class="key" data-latex="\vDash">⊨</div>
+            <div class="key" data-latex="\nvdash">⊬</div>
+            <div class="key" data-latex="\nmodels">⊭</div>
+
+            <!-- Miscellaneous logic symbols -->
+            <div class="key" data-latex="\therefore">∴</div>
+            <div class="key" data-latex="\because">∵</div>
+            <div class="key" data-latex="\top">⊤</div>
+            <div class="key" data-latex="\bot">⊥</div>
+            <div class="key" data-latex="\emptyset">∅</div>
+            <div class="key" data-latex="\in">∈</div>
+            <div class="key" data-latex="\notin">∉</div>
+            <div class="key" data-latex="\ni">∋</div>
+            <div class="key" data-latex="\subset">⊂</div>
+            <div class="key" data-latex="\subseteq">⊆</div>
+            <div class="key" data-latex="\supset">⊃</div>
+            <div class="key" data-latex="\supseteq">⊇</div>
+            <div class="key" data-latex="\sqsubset">⊏</div>
+            <div class="key" data-latex="\sqsupset">⊐</div>
+        </div>
+
+        <!-- Set Tab -->
+        <div class="tab-content" id="set">
+            <div class="key" data-latex="\in">∈</div>
+            <div class="key" data-latex="\notin">∉</div>
+            <div class="key" data-latex="\ni">∋</div>
+            <div class="key" data-latex="\not\ni">∌</div>
+
+            <div class="key" data-latex="\subset">⊂</div>
+            <div class="key" data-latex="\subseteq">⊆</div>
+            <div class="key" data-latex="\supset">⊃</div>
+            <div class="key" data-latex="\supseteq">⊇</div>
+            <div class="key" data-latex="\nsubseteq">⊈</div>
+            <div class="key" data-latex="\nsupseteq">⊉</div>
+
+            <div class="key" data-latex="\cup">∪</div>
+            <div class="key" data-latex="\cap">∩</div>
+            <div class="key" data-latex="\setminus">∖</div>
+            <div class="key" data-latex="\complement">∁</div>
+            <div class="key" data-latex="\emptyset">∅</div>
+
+            <div class="key" data-latex="\bigcup">⋃</div>
+            <div class="key" data-latex="\bigcap">⋂</div>
+
+            <div class="key" data-latex="\mathcal{P}">𝒫</div> <!-- Power set -->
+            <div class="key" data-latex="\times">×</div> <!-- Cartesian product -->
+            <div class="key" data-latex="\uplus">⊎</div> <!-- Disjoint union -->
+
+            <div class="key" data-latex="\exists">∃</div>
+            <div class="key" data-latex="\forall">∀</div>
+        </div>
+
+        <!-- Functions Tab -->
+        <div class="tab-content" id="functions">
+            <!-- Trigonometric functions -->
+            <div class="key" data-latex="\sin">sin</div>
+            <div class="key" data-latex="\cos">cos</div>
+            <div class="key" data-latex="\tan">tan</div>
+            <div class="key" data-latex="\csc">csc</div>
+            <div class="key" data-latex="\sec">sec</div>
+            <div class="key" data-latex="\cot">cot</div>
+
+            <!-- Inverse trigonometric functions -->
+            <div class="key" data-latex="\arcsin">arcsin</div>
+            <div class="key" data-latex="\arccos">arccos</div>
+            <div class="key" data-latex="\arctan">arctan</div>
+
+            <!-- Hyperbolic functions -->
+            <div class="key" data-latex="\sinh">sinh</div>
+            <div class="key" data-latex="\cosh">cosh</div>
+            <div class="key" data-latex="\tanh">tanh</div>
+
+            <!-- Roots and exponents -->
+            <div class="key" data-latex="\sqrt">√</div>
+            <div class="key" data-latex="\sqrt[n]{x}">ⁿ√x</div>
+            <div class="key" data-latex="x^{2}">x²</div>
+            <div class="key" data-latex="x^{3}">x³</div>
+            <div class="key" data-latex="e^{x}">e^x</div>
+            <div class="key" data-latex="a^{x}">a^x</div>
+
+            <!-- Logarithmic and exponential -->
+            <div class="key" data-latex="\ln">ln</div>
+            <div class="key" data-latex="\log">log</div>
+            <div class="key" data-latex="\log_{a}{x}">logₐx</div>
+            <div class="key" data-latex="\exp">exp</div>
+
+            <!-- Calculus operations -->
+            <div class="key" data-latex="\frac{a}{b}">\frac{a}{b}</div>
+            <div class="key" data-latex="\dfrac{dy}{dx}">dy/dx</div>
+            <div class="key" data-latex="\partial">∂</div>
+            <div class="key" data-latex="\int">∫</div>
+            <div class="key" data-latex="\iint">∬</div>
+            <div class="key" data-latex="\iiint">∭</div>
+            <div class="key" data-latex="\oint">∮</div>
+            <div class="key" data-latex="\sum">∑</div>
+            <div class="key" data-latex="\prod">∏</div>
+            <div class="key" data-latex="\lim">lim</div>
+            <div class="key" data-latex="\lim_{x \to \infty}">limₓ→∞</div>
+
+            <!-- Function definition and evaluation -->
+            <div class="key" data-latex="f(x)">f(x)</div>
+            <div class="key" data-latex="f^{-1}(x)">f⁻¹(x)</div>
+            <div class="key" data-latex="f'(x)">f′(x)</div>
+            <div class="key" data-latex="f''(x)">f″(x)</div>
+        </div>
+
+        <!-- Calculus Tab -->
+        <div class="tab-content" id="calculus">
+            <!-- Derivatives -->
+            <div class="key" data-latex="\frac{d}{dx}">d/dx</div>
+            <div class="key" data-latex="\frac{dy}{dx}">dy/dx</div>
+            <div class="key" data-latex="\frac{d^2y}{dx^2}">d²y/dx²</div>
+            <div class="key" data-latex="\frac{\partial}{\partial x}">∂/∂x</div>
+            <div class="key" data-latex="\frac{\partial^2}{\partial x^2}">∂²/∂x²</div>
+            <div class="key" data-latex="f'(x)">f′(x)</div>
+            <div class="key" data-latex="f''(x)">f″(x)</div>
+
+            <!-- Integrals -->
+            <div class="key" data-latex="\int">∫</div>
+            <div class="key" data-latex="\int_{}^{}">∫</div>
+            <div class="key" data-latex="\int_{a}^{b}">∫ₐᵇ</div>
+            <div class="key" data-latex="\iint">∬</div>
+            <div class="key" data-latex="\iiint">∭</div>
+            <div class="key" data-latex="\oint">∮</div>
+
+            <!-- Limits -->
+            <div class="key" data-latex="\lim">lim</div>
+            <div class="key" data-latex="\lim_{x \to a}">limₓ→a</div>
+            <div class="key" data-latex="\lim_{x \to \infty}">limₓ→∞</div>
+
+            <!-- Summation & Product -->
+            <div class="key" data-latex="\sum">∑</div>
+            <div class="key" data-latex="\sum_{i=1}^n">∑ᵢ₌₁ⁿ</div>
+            <div class="key" data-latex="\prod">∏</div>
+            <div class="key" data-latex="\prod_{i=1}^n">∏ᵢ₌₁ⁿ</div>
+
+            <!-- Special symbols -->
+            <div class="key" data-latex="\partial">∂</div>
+            <div class="key" data-latex="\infty">∞</div>
+            <div class="key" data-latex="\nabla">∇</div>
+            <div class="key" data-latex="\Delta">Δ</div>
+            <div class="key" data-latex="\delta">δ</div>
+            <div class="key" data-latex="\epsilon">ε</div>
+
+            <!-- Vector calculus -->
+            <div class="key" data-latex="\vec{v}">→v</div>
+            <div class="key" data-latex="\nabla \cdot \vec{F}">div</div>
+            <div class="key" data-latex="\nabla \times \vec{F}">curl</div>
+        </div>
+
+        <!-- Trigonometry Tab -->
+        <div class="tab-content" id="trigonometry">
+            <!-- Basic Trigonometric Functions -->
+            <div class="key" data-latex="\sin">sin</div>
+            <div class="key" data-latex="\cos">cos</div>
+            <div class="key" data-latex="\tan">tan</div>
+            <div class="key" data-latex="\csc">csc</div>
+            <div class="key" data-latex="\sec">sec</div>
+            <div class="key" data-latex="\cot">cot</div>
+
+            <!-- Inverse Trig Functions -->
+            <div class="key" data-latex="\arcsin">arcsin</div>
+            <div class="key" data-latex="\arccos">arccos</div>
+            <div class="key" data-latex="\arctan">arctan</div>
+            <div class="key" data-latex="\sin^{-1}">sin⁻¹</div>
+            <div class="key" data-latex="\cos^{-1}">cos⁻¹</div>
+            <div class="key" data-latex="\tan^{-1}">tan⁻¹</div>
+
+            <!-- Hyperbolic Trig Functions -->
+            <div class="key" data-latex="\sinh">sinh</div>
+            <div class="key" data-latex="\cosh">cosh</div>
+            <div class="key" data-latex="\tanh">tanh</div>
+            <div class="key" data-latex="\csch">csch</div>
+            <div class="key" data-latex="\sech">sech</div>
+            <div class="key" data-latex="\coth">coth</div>
+
+            <!-- Inverse Hyperbolic Functions -->
+            <div class="key" data-latex="\sinh^{-1}">sinh⁻¹</div>
+            <div class="key" data-latex="\cosh^{-1}">cosh⁻¹</div>
+            <div class="key" data-latex="\tanh^{-1}">tanh⁻¹</div>
+
+            <!-- Angle and Symbols -->
+            <div class="key" data-latex="\theta">θ</div>
+            <div class="key" data-latex="\phi">φ</div>
+            <div class="key" data-latex="\alpha">α</div>
+            <div class="key" data-latex="\beta">β</div>
+            <div class="key" data-latex="\angle">∠</div>
+            <div class="key" data-latex="\measuredangle">∡</div>
+            <div class="key" data-latex="\degrees">°</div>
+
+            <!-- Identities and Ratios -->
+            <div class="key" data-latex="\sin^2\theta + \cos^2\theta = 1">ID1</div>
+            <div class="key" data-latex="\tan\theta = \frac{\sin\theta}{\cos\theta}">ID2</div>
+            <div class="key" data-latex="\cot\theta = \frac{1}{\tan\theta}">ID3</div>
+        </div>
+
+        <!-- Matrix Tab -->
+        <div class="tab-content" id="matrix">
+            <!-- Common Matrix Formats -->
+            <div class="key" data-latex="\begin{pmatrix} a & b \\ c & d \end{pmatrix}">2×2</div>
+            <div class="key" data-latex="\begin{pmatrix} a & b & c \\ d & e & f \\ g & h & i \end{pmatrix}">3×3</div>
+            <div class="key" data-latex="\begin{pmatrix} a & b & c & d \\ e & f & g & h \\ i & j & k & l \\ m & n & o & p \end{pmatrix}">4×4</div>
+            <!-- Other Matrix Brackets -->
+            <div class="key" data-latex="\begin{bmatrix} a & b \\ c & d \end{bmatrix}">[ ]</div>
+            <div class="key" data-latex="\begin{Bmatrix} a & b \\ c & d \end{Bmatrix}">{ }</div>
+            <div class="key" data-latex="\begin{vmatrix} a & b \\ c & d \end{vmatrix}">| |</div>
+            <div class="key" data-latex="\begin{Vmatrix} a & b \\ c & d \end{Vmatrix}">‖ ‖</div>
+            <!-- Dynamic Matrix Button -->
+            <div class="key" data-latex="DYNAMIC_MATRIX">[n×m]</div>
+            <!-- Operations -->
+            <div class="key" data-latex="\det">det</div>
+            <div class="key" data-latex="\cdot">·</div>
+            <div class="key" data-latex="\times">×</div>
+            <div class="key" data-latex="^{T}">T</div>
+            <div class="key" data-latex="^{-1}">⁻¹</div>
+            <!-- Vectors -->
+            <div class="key" data-latex="\vec{v}">→v</div>
+            <div class="key" data-latex="\hat{i}">î</div>
+            <div class="key" data-latex="\hat{j}">ĵ</div>
+            <div class="key" data-latex="\hat{k}">k̂</div>
+            <!-- Linear Algebra -->
+            <div class="key" data-latex="\operatorname{rank}(A)">rank</div>
+            <div class="key" data-latex="\operatorname{tr}(A)">trace</div>
+            <div class="key" data-latex="I_n">Iₙ</div>
+            <div class="key" data-latex="A^{-1}">A⁻¹</div>
+        </div>
+        <!-- Algebra Tab -->
+        <div class="tab-content" id="algebra">
+            <div class="key" data-latex="\frac">frac</div>
+            <div class="key" data-latex="\frac{a}{b}">a/b</div>
+            <div class="key" data-latex="^{}">^</div>
+            <div class="key" data-latex="_{}">_</div>
+            <div class="key" data-latex="\sqrt">√</div>
+            <div class="key" data-latex="\sqrt[]{}">√</div>
+            <div class="key" data-latex="\sum">∑</div>
+            <div class="key" data-latex="\pm">±</div>
+            <div class="key" data-latex="\approx">≈</div>
+            <div class="key" data-latex="\neq">≠</div>
+            <div class="key" data-latex="\equiv">≡</div>
+            <div class="key" data-latex="x^{n}">x^n</div>
+            <div class="key" data-latex="x_{n}">x_n</div>
+            <div class="key" data-latex="\frac{1}{x}">1/x</div>
+            <div class="key" data-latex="|x|">|x|</div>
+        </div>
+        <!-- Vector Tab -->
+        <div class="tab-content" id="vector">
+            <div class="key" data-latex="\vec{v}">v⃗</div>
+            <div class="key" data-latex="\cdot">·</div>
+            <div class="key" data-latex="\times">×</div>
+            <div class="key" data-latex="\norm{v}">||v||</div>
+            <div class="key" data-latex="\hat{v}">v̂</div>
+            <div class="key" data-latex="\angle">∠</div>
+            <div class="key" data-latex="\proj_{v}">proj_v</div>
+            <div class="key" data-latex="\perp">⊥</div>
+            <div class="key" data-latex="\parallel">∥</div>
+            <div class="key" data-latex="\vec{0}">0⃗</div>
+            <div class="key" data-latex="\overrightarrow{AB}">AB⃗</div>
+        </div>
+        <!-- Permutation Tab -->
+        <div class="tab-content" id="permutation">
+            <div class="key" data-latex="P(n,r)">P(n,r)</div>
+            <div class="key" data-latex="C(n,r)">C(n,r)</div>
+            <div class="key" data-latex="\binom{n}{r}">{n choose r}</div>
+            <div class="key" data-latex="n!">n!</div>
+            <div class="key" data-latex="\sigma">σ</div>
+            <div class="key" data-latex="\pi">π</div>
+            <div class="key" data-latex="\tau">τ</div>
+            <div class="key" data-latex="\rho">ρ</div>
+            <div class="key" data-latex="( )">( )</div>
+            <div class="key" data-latex="[ ]">[ ]</div>
+            <div class="key" data-latex="{ }">{ }</div>
+        </div>
+        <!-- Geometry Tab -->
+        <div class="tab-content" id="geometry">
+            <div class="key" data-latex="\angle">∠</div>
+            <div class="key" data-latex="\triangle">△</div>
+            <div class="key" data-latex="\perp">⊥</div>
+            <div class="key" data-latex="\parallel">∥</div>
+            <div class="key" data-latex="\cong">≅</div>
+            <div class="key" data-latex="\sim">~</div>
+            <div class="key" data-latex="\pi">π</div>
+            <div class="key" data-latex="\circ">°</div>
+            <div class="key" data-latex="\overline{AB}">AB̅</div>
+            <div class="key" data-latex="\overrightarrow{AB}">AB⃗</div>
+            <div class="key" data-latex="\square">□</div>
+            <div class="key" data-latex="\circle">○</div>
+        </div>
+        <!-- Probability Tab -->
+        <div class="tab-content" id="probability">
+            <div class="key" data-latex="P(A)">P(A)</div>
+            <div class="key" data-latex="\cup">∪</div>
+            <div class="key" data-latex="\cap">∩</div>
+            <div class="key" data-latex="\bar{A}">A̅</div>
+            <div class="key" data-latex="E[X]">E[X]</div>
+            <div class="key" data-latex="\sigma">σ</div>
+            <div class="key" data-latex="\mu">μ</div>
+            <div class="key" data-latex="Var(X)">Var(X)</div>
+            <div class="key" data-latex="\sim">~</div>
+            <div class="key" data-latex="|">|</div>
+            <div class="key" data-latex="Cov(X,Y)">Cov(X,Y)</div>
+            <div class="key" data-latex="\rho_{X,Y}">ρ_X,Y</div>
+        </div>
+        <!-- Constants Tab -->
+        <div class="tab-content" id="constants">
+            <div class="key" data-latex="\pi">π</div>
+            <div class="key" data-latex="e">e</div>
+            <div class="key" data-latex="\phi">φ</div>
+            <div class="key" data-latex="i">i</div>
+            <div class="key" data-latex="\infty">∞</div>
+            <div class="key" data-latex="\gamma">γ</div>
+            <div class="key" data-latex="c">c</div>
+            <div class="key" data-latex="\hbar">ℏ</div>
+            <div class="key" data-latex="G">G</div>
+            <div class="key" data-latex="k">k</div>
+            <div class="key" data-latex="\epsilon_0">ε_0</div>
+            <div class="key" data-latex="\mu_0">μ_0</div>
+        </div>
+        <!-- Operators Tab -->
+        <div class="tab-content" id="operators">
+            <div class="key" data-latex="+">+</div>
+            <div class="key" data-latex="-">-</div>
+            <div class="key" data-latex="\times">×</div>
+            <div class="key" data-latex="\div">÷</div>
+            <div class="key" data-latex="=">=</div>
+            <div class="key" data-latex="\neq">≠</div>
+            <div class="key" data-latex="\leq">≤</div>
+            <div class="key" data-latex="\geq">≥</div>
+            <div class="key" data-latex="\approx">≈</div>
+            <div class="key" data-latex="\mod">mod</div>
+            <div class="key" data-latex="\oplus">⊕</div>
+            <div class="key" data-latex="\otimes">⊗</div>
+        </div>
+
+        <!-- Symbols Tab -->
+        <div class="tab-content" id="symbols">
+            <div class="key" data-latex="\to">→</div>
+            <div class="key" data-latex="\leftarrow">←</div>
+            <div class="key" data-latex="\rightarrow">→</div>
+            <div class="key" data-latex="\leftrightarrow">↔</div>
+            <div class="key" data-latex="\uparrow">↑</div>
+            <div class="key" data-latex="\downarrow">↓</div>
+            <div class="key" data-latex="\infty">∞</div>
+            <div class="key" data-latex="\hbar">ℏ</div>
+            <div class="key" data-latex="\aleph">ℵ</div>
+            <div class="key" data-latex="\nabla">∇</div>
+            <div class="key" data-latex="\partial">∂</div>
+            <div class="key" data-latex="\bullet">•</div>
+            <div class="key" data-latex="\circ">°</div>
+            <div class="key" data-latex="\angle">∠</div>
+            <div class="key" data-latex="\triangle">△</div>
+        </div>
+        <!-- Accents Tab -->
+        <div class="tab-content" id="accents">
+            <div class="key" data-latex="\hat{a}">â</div>
+            <div class="key" data-latex="\bar{a}">ā</div>
+            <div class="key" data-latex="\vec{a}">a⃗</div>
+            <div class="key" data-latex="\tilde{a}">ã</div>
+            <div class="key" data-latex="\dot{a}">ȧ</div>
+            <div class="key" data-latex="\ddot{a}">ä</div>
+            <div class="key" data-latex="\breve{a}">ă</div>
+            <div class="key" data-latex="\check{a}">ǎ</div>
+            <div class="key" data-latex="\grave{a}">à</div>
+            <div class="key" data-latex="\acute{a}">á</div>
+        </div>
+        <!-- Relations Tab -->
+        <div class="tab-content" id="relations">
+            <div class="key" data-latex="=">=</div>
+            <div class="key" data-latex="\neq">≠</div>
+            <div class="key" data-latex="\leq">≤</div>
+            <div class="key" data-latex="\geq">≥</div>
+            <div class="key" data-latex="\approx">≈</div>
+            <div class="key" data-latex="\equiv">≡</div>
+            <div class="key" data-latex="\propto">∝</div>
+            <div class="key" data-latex="\sim">~</div>
+            <div class="key" data-latex="\cong">≅</div>
+            <div class="key" data-latex="\prec">≺</div>
+            <div class="key" data-latex="\succ">≻</div>
+            <div class="key" data-latex="\ll">≪</div>
+            <div class="key" data-latex="\gg">≫</div>
+        </div>
+    </div>
+    <button class="backspace-button" onclick="deleteBackward()">DEL</button>
+    <button class="backspace-button" id="getLatexButton" onclick="getLatexContent()">DONE</button>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script>
+<script src="./mathlive.min.js"></script>
+
+<script>
+    function getLatexContent() {
+    const latex = window.MathQuillBridge.getLatex();
+    // For testing in the browser, you can alert or log the content
+    console.log("LaTeX Content:", latex);
+    // In an Android app, this will be passed to the native side
+    if (window.AndroidBridge) {
+        window.AndroidBridge.onLatexReceived(latex);
+    }
+}
+    // Initialize MathQuill
+    const MQ = MathQuill.getInterface(2);
+    const mathField = MQ.MathField(document.getElementById('mathField'), {
+        spaceBehavesLikeTab: true
+    });
+
+    // JavaScript Bridge Interface
+    window.MathQuillBridge = {
+        getLatex: function() {
+            return mathField.latex() || '';
+        }
+    };
+
+    // Tab switching
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchTab(tab));
+        tab.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            switchTab(tab);
+        });
+    });
+
+    // Dynamic matrix generation
+    function generateMatrixLatex(rows, cols) {
+        let body = '';
+        for (let i = 0; i < rows; i++) {
+            let row = Array(cols).fill(' ').join(' & ');
+            body += row + (i < rows - 1 ? ' \\\\ ' : '');
+        }
+        return `\\begin{pmatrix} ${body} \\end{pmatrix}`;
+    }
+
+    // Key insertion
+    function insertKey(key) {
+        const latex = key.dataset.latex;
+
+        if (latex === 'DYNAMIC_MATRIX') {
+            const rows = parseInt(prompt('Enter number of rows:'), 10);
+            const cols = parseInt(prompt('Enter number of columns:'), 10);
+
+            if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
+                alert('Please enter valid positive integers for rows and columns.');
+                return;
+            }
+
+            const matrixLatex = generateMatrixLatex(rows, cols);
+            mathField.latex(mathField.latex() + matrixLatex);
+            mathField.focus();
+            return;
+        }
+
+        // Handle special commands
+        if (['\\frac', '\\sqrt[]{}', '\\int_{}^{}', '\\binom{n}{r}', '\\int_{a}^{b}', '\\log_{a}{x}'].includes(latex)) {
+            mathField.cmd(latex);
+            mathField.write('{}');
+            mathField.keystroke('Left');
+        }
+        // Handle matrix environments
+        else if (latex.includes('\\begin{pmatrix}') || latex.includes('\\begin{bmatrix}') ||
+                 latex.includes('\\begin{Bmatrix}') || latex.includes('\\begin{vmatrix}') ||
+                 latex.includes('\\begin{Vmatrix}')) {
+            mathField.latex(mathField.latex() + latex);
+            // Move cursor inside the matrix (optional, adjust as needed)
+            for (let i = 0; i < latex.length; i++) {
+                mathField.keystroke('Left');
+            }
+            mathField.write(' ');
+            mathField.keystroke('Right');
+        }
+        // Handle single characters
+        else if (latex.match(/^[a-z0-9]$/)) {
+            mathField.write(latex);
+        }
+        // Default: append LaTeX
+        else {
+            mathField.latex(mathField.latex() + latex);
+        }
+        mathField.focus();
+    }
+
+    document.querySelectorAll('.key').forEach(key => {
+        key.addEventListener('click', () => insertKey(key));
+        key.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            insertKey(key);
+        });
+    });
+
+    // Delete backward
+    function deleteBackward() {
+        mathField.keystroke('Backspace');
+        mathField.focus();
+    }
+
+    document.querySelector('.backspace-button').addEventListener('click', deleteBackward);
+    document.querySelector('.backspace-button').addEventListener('touchend', (e) => {
+        e.preventDefault();
+        deleteBackward();
+    });
+
+    // Tab scrolling with arrows
+    const tabs = document.querySelector('.tabs');
+    const scrollLeftArrow = document.getElementById('scrollLeft');
+    const scrollRightArrow = document.getElementById('scrollRight');
+
+    function updateArrowVisibility() {
+        const maxScroll = tabs.scrollWidth - tabs.clientWidth;
+        scrollLeftArrow.classList.toggle('hidden', tabs.scrollLeft <= 0);
+        scrollRightArrow.classList.toggle('hidden', tabs.scrollLeft >= maxScroll - 1);
+    }
+
+    function scrollTabs(direction) {
+        const scrollAmount = 100;
+        const currentScroll = tabs.scrollLeft;
+        const newScroll = direction === 'left' ? currentScroll - scrollAmount : currentScroll + scrollAmount;
+        tabs.scrollTo({ left: newScroll, behavior: 'smooth' });
+    }
+
+    scrollLeftArrow.addEventListener('click', () => scrollTabs('left'));
+    scrollLeftArrow.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        scrollTabs('left');
+    });
+
+    scrollRightArrow.addEventListener('click', () => scrollTabs('right'));
+    scrollRightArrow.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        scrollTabs('right');
+    });
+
+    tabs.addEventListener('scroll', updateArrowVisibility);
+    window.addEventListener('resize', updateArrowVisibility);
+    document.addEventListener('DOMContentLoaded', updateArrowVisibility);
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Attach click listener to all keys
+        document.querySelectorAll(".key").forEach(key => {
+            key.addEventListener("click", () => {
+                const latexCode = key.getAttribute("data-latex");
+
+                if (latexCode === "DYNAMIC_MATRIX") {
+                    handleDynamicMatrix();
+                } else {
+                    insertLatex(latexCode);
+                }
+            });
+        });
+
+        function handleDynamicMatrix() {
+            const rows = parseInt(prompt("Enter number of rows:"), 10);
+            const cols = parseInt(prompt("Enter number of columns:"), 10);
+
+            if (isNaN(rows) || isNaN(cols) || rows <= 0 || cols <= 0) {
+                alert("Please enter valid positive integers for rows and columns.");
+                return;
+            }
+
+            const matrixLatex = generateMatrixLatex(rows, cols);
+            insertLatex(matrixLatex);
+        }
+
+        function generateMatrixLatex(rows, cols) {
+            let body = "";
+            for (let i = 0; i < rows; i++) {
+                let row = Array(cols).fill("&").join(" ");
+                body += row + (i < rows - 1 ? " \\\\ " : "");
+            }
+            return `\\begin{pmatrix} ${body} \\end{pmatrix}`;
+        }
+
+        // Replace this with your actual insertion logic
+        function insertLatex(latex) {
+            console.log("Insert LaTeX:", latex);
+            // e.g., insert into an input field or render using MathJax or KaTeX
+            const output = document.getElementById("output");
+            if (output) output.value += latex;
+        }
+    });
+</script>
+
+</body>
+</html>

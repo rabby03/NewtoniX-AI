@@ -1,0 +1,80 @@
+[versions]
+agp = "8.9.2"
+coil = "2.7.0"
+commonsLang3 = "3.17.0"
+core = "1.17.1"
+cropper = "2.8.0"
+facebookAndroidSdk = "18.0.3"
+facebookAndroidSdkVersion = "18.0.3"
+filamentAndroid = "1.17.0"
+firebaseAuth = "23.2.0"
+firebaseBom = "33.13.0"
+firebaseFirestore = "25.1.4"
+firebase-storage = "21.0.1" # Latest Storage version as of now
+generativeai = "0.9.0"
+glide = "4.16.0"
+jlatexmath = "1.0.7"
+jlatexmathAndroid = "0.1.8"
+kotlin = "2.1.0"
+coreKtx = "1.16.0"
+junit = "4.13.2"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+kotlinxCoroutinesAndroid = "1.10.2"
+loggingInterceptor = "4.12.0"
+material = "1.12.0"
+constraintlayout = "2.2.1"
+lifecycleLivedataKtx = "2.8.7"
+lifecycleViewmodelKtx = "2.8.7"
+nanohttpd = "2.3.1"
+navigationFragmentKtx = "2.8.9"
+navigationUiKtx = "2.8.9"
+playServicesAuth = "21.3.0"
+playServicesAuthVersion = "21.3.0"
+playServicesBase = "18.7.0"
+rajawali = "1.2.1970"
+retrofit = "2.11.0"
+sceneform = "1.21.0"
+sceneformUx = "1.17.1"
+sceneformVersion = "1.22.0"
+springCore = "6.2.6"
+twitterCore = "3.3.0"
+ucrop = "2.2.6"
+activity = "1.10.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+commons-lang3 = { module = "org.apache.commons:commons-lang3", version.ref = "commonsLang3" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+facebook-android-sdk-vlatestrelease = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebookAndroidSdkVersion" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics", version="22.4.0" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+generativeai = { module = "com.google.ai.client.generativeai:generativeai", version.ref = "generativeai" }
+glide = { module = "com.github.bumptech.glide:glide", version = "4.16.0" }
+google-firebase-auth = { module = "com.google.firebase:firebase-auth" }
+google-firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+google-firebase-storage = { module = "com.google.firebase:firebase-storage" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+nanohttpd = { module = "org.nanohttpd:nanohttpd", version.ref = "nanohttpd" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
+play-services-base = { module = "com.google.android.gms:play-services-base", version.ref = "playServicesBase" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+ucrop = { module = "com.github.yalantis:ucrop", version.ref = "ucrop" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+

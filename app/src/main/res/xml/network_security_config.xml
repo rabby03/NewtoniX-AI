@@ -1,0 +1,10 @@
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.3</domain>
+        <domain includeSubdomains="true">accounts.google.com</domain>
+        <domain includeSubdomains="true">firebase.googleapis.com</domain>
+        <domain includeSubdomains="true">www.googleapis.com</domain>
+        <domain includeSubdomains="true">360787817100-58q58fpp3cc67rojao2kiv30gg0fcvgp.apps.googleusercontent.com</domain>
+        <base-config cleartextTrafficPermitted="false" />
+    </domain-config>
+</network-security-config>
